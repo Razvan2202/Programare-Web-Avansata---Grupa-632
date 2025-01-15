@@ -14,3 +14,4 @@ Gestionarea unui catalog de cărți: vizualizare, căutare și filtrare.
 Interfață pentru administratori, care oferă funcționalități de gestionare a catalogului.
 Validarea și securizarea datelor utilizatorilor, incluzând criptarea parolelor.
 Importarea cartilor dintr-o baza de date.
+Cartile au fost introduse in baza de date dintr-un JSON.
