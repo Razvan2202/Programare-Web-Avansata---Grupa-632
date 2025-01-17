@@ -94,6 +94,7 @@ if (!$books || count($books) === 0) {
         <h1>Welcome, <?= htmlspecialchars($_SESSION['username']); ?> (Admin)!</h1>
         <div>
             <a href="logout.php" class="button">Logout</a>
+            <a href="create_bundle.php" class="button">Create Bundle</a> <!-- Create Bundle Button -->
         </div>
     </div>
 
