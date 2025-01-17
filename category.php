@@ -1,17 +1,19 @@
 <?php
-session_start(); // incepe sesiunea
+session_start(); // Start session
 
-// include baza de date
+// Include database connection
 require 'db.php';
 
-// ia categoria si titlul prin query-uri
+// Get category, title, and price range filters from query
 $category = isset($_GET['category']) ? $_GET['category'] : 'all';
 $titleFilter = isset($_GET['title']) ? $_GET['title'] : '';
+$minPrice = isset($_GET['min_price']) ? (float)$_GET['min_price'] : 0;
+$maxPrice = isset($_GET['max_price']) && $_GET['max_price'] !== '' ? (float)$_GET['max_price'] : PHP_FLOAT_MAX;
 
-// afiseaza cartile in functie de filtre
-$books = get_books_with_filters($category, $titleFilter);
+// Get books based on filters
+$books = get_books_with_filters($category, $titleFilter, $minPrice, $maxPrice);
 
-// back to homepage
+// Determine back to homepage link
 if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
         $backHomepageLink = 'logged_admin.php';
@@ -29,6 +31,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Books in <?= htmlspecialchars($category); ?> Category</title>
     <style>
+        /* General Styles */
         body {
             background-color: beige;
             font-family: Arial, sans-serif;
@@ -82,6 +85,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
         form {
             margin-bottom: 20px;
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             gap: 10px;
         }
@@ -89,7 +93,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
             font-size: 16px;
             color: #5D3A00;
         }
-        select, input[type="text"] {
+        select, input[type="text"], input[type="number"] {
             padding: 5px;
             font-size: 14px;
             border-radius: 5px;
@@ -168,7 +172,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     </style>
 </head>
 <body>
-    <!-- butoanele din dreapta sus -->
+    <!-- Logout or Auth Buttons -->
     <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
         <a href="logout.php" class="logout-button">Logout</a>
     <?php else: ?>
@@ -180,13 +184,14 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
 
     <h1>Books in <?= htmlspecialchars($category); ?> Category</h1>
 
-    <!-- anuntul petnru reducerea la cartile de copii -->
+    <!-- Announcement for Children's Books -->
     <?php if (strtolower($category) === 'children'): ?>
         <div class="announcement">
             !!!JUST TODAY, BUY ONE CHILDREN'S BOOK, GET TWO!!!
         </div>
     <?php endif; ?>
 
+    <!-- Filter Form -->
     <form action="category.php" method="get">
         <label for="category">Choose a category:</label>
         <select name="category" id="category">
@@ -197,11 +202,21 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
                 </option>
             <?php endforeach; ?>
         </select>
+
         <label for="title">Search by Title:</label>
         <input type="text" name="title" id="title" placeholder="Enter book title" value="<?= htmlspecialchars($titleFilter); ?>">
+
+        <label for="min_price">Min Price:</label>
+        <input type="number" name="min_price" id="min_price" value="<?= htmlspecialchars($minPrice); ?>" step="0.01">
+
+        <label for="max_price">Max Price:</label>
+        <input type="number" name="max_price" id="max_price" value="<?= htmlspecialchars($maxPrice !== PHP_FLOAT_MAX ? $maxPrice : ''); ?>" step="0.01">
+
         <button type="submit">Filter Books</button>
     </form>
     <a href="<?= htmlspecialchars($backHomepageLink); ?>" class="back-button">Back to Homepage</a>
+
+    <!-- Book List -->
     <div class="book-list">
         <?php if (count($books) > 0): ?>
             <?php foreach ($books as $book): ?>
@@ -222,7 +237,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <p>No books found in this category.</p>
+            <p>No books found matching the criteria.</p>
         <?php endif; ?>
     </div>
     <footer>
