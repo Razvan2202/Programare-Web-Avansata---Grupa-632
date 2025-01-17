@@ -120,7 +120,7 @@ if (is_array($randomDiscountedBookKeys)) {
         font-size: 16px;
         color: #5D3A00;
     }
-    select, input[type="text"] {
+    select, input[type="text"], input[type="number"] {
         padding: 5px;
         font-size: 14px;
         border-radius: 5px;
@@ -168,8 +168,20 @@ if (is_array($randomDiscountedBookKeys)) {
         <label for="title">Search by Title:</label>
         <input type="text" name="title" id="title" placeholder="Enter book title">
         
+        <label for="min_price">Min Price:</label>
+        <input type="number" name="min_price" id="min_price" step="0.01" placeholder="0">
+        
+        <label for="max_price">Max Price:</label>
+        <input type="number" name="max_price" id="max_price" step="0.01" placeholder="100">
+
         <button type="submit">Filter Books</button>
     </form>
+
+    <div class="more-button">
+        <a href="bundles.php">
+            <button>View Bundles</button>
+        </a>
+    </div>
 
     <h2>Book of the Day</h2>
     <div class="book">
